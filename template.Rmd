@@ -1,0 +1,47 @@
+---
+title: 'Title'
+author: '[Ying Li](https://business.illinois.edu/profile/ying-li/)'
+date: '`r format(Sys.Date())`'
+fontsize: 12pt
+geometry: margin=1in
+output:
+  pdf_document:
+    latex_engine: xelatex
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 4
+---
+
+```{r globalsettings, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  tidy=TRUE,
+  echo=FALSE,
+  message=FALSE,
+  results='asis',
+  strip.white=TRUE,
+  fig.path='Figures/',
+  cache=FALSE,
+  highlight=TRUE,
+  width.cutoff=80,
+  size='footnotesize',
+  out.width='.9\\textwidth',
+  fig.retina=FALSE,
+  comment=NA,
+  out.extra="")
+
+if(!file.exists('Figures/')) dir.create('Figures/')
+```
+
+
+```{r eval=FALSE}
+# Frequentely used:
+- Insert a figure
+\begin{figure}
+\includegraphics{bayesplot.png}
+\caption{Estimates and Credible Intervals of A Bayesian Logit Model}
+\label{fig:bayesplot}
+\end{figure}
+Figure \ref{fig:bayesplot}
+```
+ 
+ 
