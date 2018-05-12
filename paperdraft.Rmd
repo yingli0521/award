@@ -1,0 +1,257 @@
+---
+title: "How Does Scope of Framing Affect Stakeholders' Evaluation of Firms?"
+subtitle: "Evidence from China's State-Owned Enterprises"
+author: 
+- Ying Li^[Gies School of Business, University of Illinois at Urbana-Champaign. Email: yingl6@illinois.edu]
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+geometry: margin=1.5in
+fontsize: 12pt
+---
+```{r include=FALSE}
+#bibliography: reference.bib
+knitr::opts_chunk$set(echo = F,
+                      tidy=T, 
+                      tidy.opts=list(width.cutoff=60),
+                      results='hide',
+                      strip.white=TRUE,
+                      fig.path='figs/fig',
+                      cache=F,
+                      highlight=TRUE,
+                      out.width='.9\\textwidth',
+                      out.extra="",
+                      message=FALSE,
+                      warning=FALSE,
+                      error=FALSE,
+                      comment=NA,
+                      size='footnotesize',
+                      options(digits = 3))
+
+options(xtable.comment = FALSE)
+```
+```{r library}
+library(xtable)
+library(stargazer)
+library(car)
+```
+
+\begin{abstract}
+Stakeholders evaluate firms through textual files, 
+\end{abstract}
+
+# Overview
+Evaluation is one of the most basic social processes (Lamont, 2012). In the business world, garnering positive evaluations from key stakeholders such as government, media, business partners and so on is crucial for organizations to gain legitimacy, obtain resources and establish competitive advantages (Bitektine, 2011; George, Dahlander, Graffin, & Sim, 2016). A successful framing strategy, with other things held equal, can make a positive impact on stakeholders' evaluations of organizations.
+
+Organizational scholars define framing as a strategic behavior of creating “a mental bracket that delimits attention to a portion of reality” (Giorgi & Weber, 2015). Existing research has found that organizations are more likely to win approval when their framing strategies resonate with the needs of stakeholders, are consistent over time, and are moderately novel. Despite these rich findings, one of the understudied topics is the ideal scope of framing. In other words, how focused organizations should be when intentionally projecting themselves to evaluators: should they target at one theme at a time or balance between multiple themes at the same time?
+
+This question is important because organizations are complex collectives with multiple identities. When they project their images to external audiences, they often face this dilemma between comprehensiveness and sharpness. In this paper, I borrow theories from category and identity to argue that the narrower the scope of framing, the more positive an organization is evaluated. This hypothesis is based on the argument that organizations spanning across multiple categories are more likely to be punished by evaluators, because evaluators only have limited cognitive resources to make sense of an organization's identity (Zuckerman, 1999). I test this hypothesis by analyzing the scope of framing in the context of Chinese state-owned enterprises (SOEs) applying for a government initiated innovation award through written reports from 1990 to 2011.
+
+# Data and Design
+## Data Source
+```{r cleaning, results='asis'} 
+# Import data, recode data
+mydata <- read.csv("award.csv", header = T) 
+row.names(mydata) <- mydata$appid
+n <- nrow(mydata)
+# year variable: which year a SOE applied for the award
+mydata$year <- substr(mydata$appid, 3, 6)
+library(car)
+mydata$area1<-recode(mydata$area,
+                     "1:2='North';3='East';4:5='South';6:7='West';8='Overseas'",
+                     as.factor=TRUE)
+mydata$ownership1 <- recode(mydata$ownership,
+                            "1='Central';2='Ordinary';3:6='Other'",
+                            as.factor=T)
+mydata$scale1 <- recode(mydata$scale,
+                        "1='Large';2:3='Small'",
+                        as.factor = T)
+
+# Manually check for overly influential points
+tabarea <- t(table(mydata$area1))
+print(xtable(tabarea,label="tab:area",caption="Frequency of Area"))
+print(xtable(prop.table(table(mydata$award,mydata$area1),margin=2),
+             label="tab:areaaward",
+             caption = "Overly Influential Points from the Overseas Area"))
+n_overseas <- nrow(mydata[mydata$area1=="Overseas",])
+newn <- n-n_overseas
+mydata<-mydata[!(mydata$area1=="Overseas"),]
+```
+The original data (in a textual form) are obtained from the official website of [China Enterprise Confederation (CEC)](http://www.cec1979.org.cn/glcx/index.php). CEC is a national social organization whose mission is to facilitate and celebrate Chinese firm's reform and development, but in fact it is an informal government body who is responsible for regularly reporting to China's communist party how good the nation-wide state-owned enterprises (SOE) are operating and performing. In 1990, CEC initiated an annual innovation award^[The first five were biannual. Since 2000 it became annual.], aiming to encourage creativity and stimulate vitality of China's SOEs. Every SOE is eligible to apply for this award by submitting a written report of their innovation accomplishment. CEC then organizes a panel comprised of experts from governments and universities to evaluate these reports and select a number of award-winning companies. From 1990 to 2011, there were altogether `r n` application reports, which are all available on CEC's official website. Each application report, with an average of appropriately 8000 Chinese words, is a thorough description of a firm's innovation practices. These firms are from various industries, and the innovation areas cover various management functions such as HR management, R&D, corporate governance, finance, etc..
+
+The major strength of these data is that each application report is a stand-alone, self-presenting file that the award committee heavily relies on to make a judgment, creating a suitable context to study the effect of framing. Besides, textual analysis of these application reports will produce more concrete measurements of framing strategies, as apposed to a subjective and qualitative analysis in many conventional framing research. The approach of analyzing framing through textual data is meaningful considering that a lot of evaluations are indeed produced through evaluating the information in texts. For example, graduate school committee evaluates applicants through their statement of purpose; investors evaluate projects through business proposals etc.. The major weakness is that these data alone can only provide information in texts. In the future, more external data, such as the revenue of the firms, will be collected by combining other databases^[For this method paper, this is the best data I can collect for now.].
+
+##Variables and Measurement
+```{r variables}
+# To create the variable "industry"
+indtpc <- mydata[,2:24] # select the industry topics
+indmax <- apply(indtpc,1,max)
+industry <- NULL
+for(j in 1:nrow(indtpc)){
+    for(i in 1:ncol(indtpc)){
+      if(indtpc[j,i]==indmax[j]){
+        industry[j] <- colnames(indtpc)[i]
+      }
+    }
+} # The industry varaible is represented by different topics.
+
+# To create the independent variable Framing Scope
+inntpc <- mydata[,25:51] # select the innovation topics
+max1 <- NULL; max2 <- NULL;max3 <- NULL;max4<-NULL
+for(j in 1:nrow(inntpc)){
+  max1[j] <- inntpc[j,order(inntpc[j,],decreasing=TRUE)[1]]
+  max2[j] <- inntpc[j,order(inntpc[j,],decreasing=TRUE)[2]]
+  max3[j] <- inntpc[j,order(inntpc[j,],decreasing=TRUE)[3]]
+  max4[j] <- inntpc[j,order(inntpc[j,],decreasing=TRUE)[4]]
+}
+max1 <- as.numeric(max1); max2 <- as.numeric(max2)
+max3 <- as.numeric(max3); max4 <- as.numeric(max4)
+max <- cbind(max1,max2,max3,max4)
+innvar <- apply(max[,1:3],1,sd)
+innvar2 <- apply(max,1,sd)
+# innvar is a measurement of Framing Scope: standard deviation of the biggest 3 topic probabilities
+
+# Multiple Industry Identities
+dmax1 <- NULL; dmax2 <- NULL;dmax3 <- NULL
+for(j in 1:nrow(indtpc)){
+  dmax1[j] <- indtpc[j,order(indtpc[j,],decreasing=TRUE)[1]]
+  dmax2[j] <- indtpc[j,order(indtpc[j,],decreasing=TRUE)[2]]
+  dmax3[j] <- indtpc[j,order(indtpc[j,],decreasing=TRUE)[3]]
+}
+dmax1 <- as.numeric(dmax1);dmax2 <- as.numeric(dmax2)
+dmax3 <- as.numeric(dmax3)
+dmax <- cbind(dmax1,dmax2,dmax3)
+indvar <- apply(dmax,1,sd)
+
+## make a smaller dataset
+newdata <- data.frame(mydata$award, mydata[,56:59],industry, indvar, innvar)
+colnames(newdata) <- c("award","year","area","ownership","scale","industry","indvar","innvar")
+# colnames(newdata) <- c("award","year","area","ownership","scale","industry","industry Topic Scope","Framing Scope")
+# str(newdata)
+```
+
+### Dependent Variable
+```{r summary,echo=F}
+meany <- mean(mydata$award) 
+meany2 <- mean(newdata$award)
+meany1pct <- sprintf("%.1f%%", meany * 100)
+meany2pct <- sprintf("%.1f%%", meany2 * 100)
+```
+*Award winning*. The outcome variable is whether a firm won a award, with 1 indicating winning and 0 indicates losing. Before any data cleaning, `r meany1pct` of the applicants won an award in this data set. However, there are some observations that I have to delete to avoid micronumerosity and overfitting. As Table \ref{tab:area} shows that there are only `r n_overseas` out of `r n` observations, which is a warning signal of micronumeriosity if I use overseas as a dummy variable to control for area. Besides, substantially, the overseas SOEs are too different from the major body of SOEs, so deleting them is a reasonable practice. Also, as Table \ref{tab:areaaward} shows, the results of cross tabulation between area and award could be seriously distorted due to the unusual distribution of `overseas`. After deleting the observations with an `overseas` value in `area` variable, there are `r newn` observations in total and `r meany2pct` of the observations won an award. Other categorical covariates are also tested and no further evidence of micronumeriosity was found.
+
+### Independent variable
+In order to measure framing in textual data, all the application reports have been preliminarily analyzed through a textual analysis technique called topic modeling^[See Appendix A for further explanation]. As a result, 50 distinct topics are produced, 23 of which are about industries and the other 27 are about innovation areas. Every application report is assigned a coverage probability of every topic, producing a number of 1634 \times 50 topic coverage probability values.
+
+*Framing Scope* measures how balanced an application file is across different innovation topics. I measure this variable by calculating the standard deviation of the coverage probabilities in the three largest innovation topics in an application report. Higher Framing Scope represents that a firm is more focused on one topic instead of spanning multiple topics at the same time. For example, if the three largest coverage proportation for firm A is (0.3,0.3,0.3) and for firm B is (0.4,0.3,0.2), then the Framing Scope for A and B are 0 and 0.1, meaning that A tries to be diversed across multiple topics while B tries to be more focused on a smaller number of topics.
+
+I only choose the three largest innovation topics because three different categories is already an upper limit of information for people to notice and process. If all the innovation topics are used, it only adds more noise because in reality almost no applicant would try to cover all 27 innovation topics simultaneously. For a robustness check, I also measured framing scope across four innovation topics and results are similar. In terms of appropiateness of measurement, according to Figure 1 in @adcocoll2011, this measurement could satisfy both a top-down and bottom-up justification on four levels of conceptualization. In this case, the background concept is framing; the systematized concept refers to framing scope; the indicator refers to the focusing/spanning framing strategy of presenting innovation accomplishments in the application reports; scores for cases are standard deviations of the three most salient innovation topics' coverage.
+
+### Control Variables
+I add five control variables. *Area*. Chinese government tends to balance the awards-winning opportunities for firms in different geographic areas. *Scale*. Whether an applicant firm is large, medium, or small-size affects its ability to innovate and thus affect its winning probability. *Ownership*. Whether an applicant firm is a Central SOE, ordinary SOE, or other forms. *Industry Scope*. Chinese SOEs are often big companies that operate across multiple industries. Government may treat firms differently if they express their multi-industry identities in the application reports. I measure this variable by calculating the standard deviation of topic coverage proportions across the three largest covered industry topics. *Industry*. Different industries have different evaluation logics, so it would be better to control within industries. I measure the industry variable by referring to the industry topic that has the largest coverage proportion.
+
+## Adjustment Strategy
+I'm interested in infering the partial relationship between Framing Scope and probability of winning an award. I'm not using an experiment or a quasi-experiment (e.g. using matching to create an "as if" experiment) design, because my major variable of interest is continuous and dichotomizing it would sacrifice valuable information. Instead, I use a model-based design in this paper because in the context of China's SOEs, the outcome variable can be viewed as coming from a Bernoulli distribution, whose probability of having a "successful" outcome depends on a set of variables, which are ones that listed as control variables plus the Framing Scope variable. Since the underlying data generating process is that the award committee makes the awarding (or not) judgment of firms' innovation accomplishment based on certain characteristics. What I don't observe that motivates me to do statistical inference is the parameters that maximize the likelihood of observing the data I have given a specific data generating process.
+
+The repeating process for inference does not come from permutating, because permutation is more intuitive for an experiment design. It would be harder to interpret the sharp null hypothesis when the "treatment" variable is continuous. The repeating process does not come from bootstrapping either for two reasons. First, what I have is already a population instead of a sample, so the logic of resampling does not really apply. Second, the model-based design enables me to use maximum likelihood method for estimation and inference, so the estimates come from first-order derivative -- when the first-order derivative equals 0 the likelihood of observing the data is maximized (or minimized depending on the sign of the second derivative at this turning point), and the standard errors come from the second-order derivative. The p-values mean that if the parameter comes from a normal distribution, with the estimate being the mean and the stand errors being the standard deviance, what's the chance of observing such an estimate given the model is true. The sampling distribution is a normal distribution because maximum likelihood is asympotatically normal. Given the large observation numbers of this study, this property can be relied on.
+
+```{r description, results='asis'}
+library(stargazer)
+data <- cbind(mydata[,52:56],newdata[,7:8])
+stargazer(data,header = F, title = "Description")
+```
+
+# Model Specification
+A binary outcome variable is not an adequate reason to exclude using OLS, especially considering that the predicted y range can provide us extra information to evaluate model specification and that we can have multiple techniques to correct for heterogeneity problems. However, OLS does not quite fit with the assumed data generating process in this study. 
+
+I use a logit transformation implemented via a generalized linear model. 
+Admittedly, logit is not the only link function that can transform $X\beta$, so I also tried probit and cloglog link functions. The log likelihoods across these three link models are very close to each other and the PP-plots show that the predicted probablities are around a 45 degree line. Given the relative advantage of interpretation of odds ratio, I only present the results of a logit model here. The model equation is as follows:
+
+$$log \frac{Pr(award)}{1-Pr(award)}=\beta_{0}+\beta_{1}framing + \beta_{2}area + \beta_{3}ownership +\beta_{4}scale +\epsilon$$
+```{r inference}
+# ols model
+ols.model <- lm(award~ area + ownership + scale + industry + indvar + innvar, data = newdata)
+summary(ols.model)
+pred.ols <- predict(ols.model)
+
+# Logit model
+logit.model <- glm(award~ area + ownership + scale + industry + indvar + innvar, data = newdata, family= binomial(link=logit))
+summary(logit.model)
+pred.logit <- predict(logit.model, type = 'response') 
+
+probit.model <- glm(award~ area + ownership + scale + industry + indvar + innvar, data = newdata, family= binomial(link=probit))
+summary(probit.model)
+pred.probit <- predict(probit.model, type = 'response') 
+
+clog.model <- glm(award~ area + ownership + scale + industry + indvar + innvar, data = newdata, family= binomial(link=cloglog))
+summary(clog.model)
+pred.clog <- predict(clog.model, type = 'response') 
+
+# logit.model1 <- glm(award~ area + ownership + scale + indvar + innvar, data = newdata, family= binomial(link=logit))
+# anova(logit.model, logit.model1, test ="Chisq")
+# ...
+# I tried other models with or without a certain variable and with some interactions between variables. By refering to the change of log likelihood and degrees of freedom, it seems that the current model realizes the best fit.
+
+# I will be very surprised if a simple unaltered stargazer table from an lm or glm canned model is appropriate for any of your datasets — although if you show enough simulation studies and careful argument and reasoning, I am ready to accept such a thing.
+```
+
+# Results
+```{r evaluation}
+# multiple link functions
+par(mfrow=c(1,2))  
+plot(pred.logit,pred.probit)
+plot(pred.logit,pred.clog)
+c(logLik(logit.model),logLik(probit.model),logLik(clog.model))
+
+## biase
+biase <- mean(pred.logit) - meany2 # A very very small number, almost 0
+
+# consistency: We already know that maximum likelihood estimation is asymtotically consistent.
+
+# log likelihood
+ll <- logLik(logit.model)
+
+## the accurate rate of prediction is
+ConMatrix <- table(newdata$award, predict > meany2)
+accuracy <- data.frame(ConMatrix)
+accrate <- (accuracy[1,3]+accuracy[4,3])/(accuracy[1,3]+accuracy[2,3]+accuracy[3,3]+accuracy[4,3])
+
+# type I error
+
+
+```
+
+Report log likelihood is `r ll`. Accurate rate is `r accrate`.
+ increase by , the odds of winning an award increases by (i.e. exp(`r `)). This change is significant at the 0.05 level. Although this interpretation looks simple and thus appealing, it avoids talking about the subtantial impact of the independent variable and the awkwardness of the concept "odds ratio". Interpretation is very important for logit models, which is unfortunately often overlooked or glossed over in many published works. With other covariates held at their mean and dummy variables at zero, moving from the 25th to the 75th percentile on Framing Scope is estimated to increase the predicted probability of winning an award by `r ` percentage points.
+
+give a graph
+
+# Reference
+```{r 'biblio', comment=NA} 
+# bibliography() 
+```
+# Appendix A
+While how the topic modelling process was conducted is beyond the scope of this paper, I would like to emphasize that the interpretation of the topic themes still depends on human rather than machine. I reached the conclusion of whether a topic belongs to the industry category or the innovation category by consulting an experienced panel expert for CEC
+```{r echo=T,results='asis'}
+# Topic model
+## 1. industry topics (col2:col24):
+## 2. innovation area topics (col25:col51):
+topicmodel <- head(mydata)[,c(2:4,27:29)]
+colnames(topicmodel) <- c("Real Estate","Electricity","Agriculture","Environment Conservation","Factory and workshop management","marketing")
+print(xtable(topicmodel,label="tab:tp",caption="Example Topic Modelling Results"))
+```
+
+# Appendix B
+As a reproducible research project, all the original data and Rmarkdown file can be assessed through my Github page<https://github.com/yingli0521/award>.
+```{r appendix, results='verbatim',echo=TRUE,eval=FALSE}
+<<library>>
+<<cleaning>>
+<<variables>>
+<<summary>>
+<<description>>
+<<inference>>
+<<evaluation>>
+<<biblio>>
+```

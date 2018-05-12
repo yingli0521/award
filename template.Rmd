@@ -42,6 +42,11 @@ if(!file.exists('Figures/')) dir.create('Figures/')
 \label{fig:bayesplot}
 \end{figure}
 Figure \ref{fig:bayesplot}
+
+# Appendix 
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+If you want to remove the first chunk, you can write knitr::all_labels()[-1]
+```
 ```
  
  
