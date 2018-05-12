@@ -1,5 +1,8 @@
+# Greetings
+
 Hello friends,
-
-Please don't use the data from this repo without my consent, even if this is a public repo. (Truth is I don't want to pay for a private one). 
-
+Please don't use the data from this repo for publication use without my consent. 
 Thank you very much!
+
+# Instructions
+finalpaper.rmd contains everything.
