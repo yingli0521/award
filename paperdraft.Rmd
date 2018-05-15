@@ -12,7 +12,7 @@ geometry: margin=1.5in
 fontsize: 12pt
 bibliography: ref.bib
 ---
-```{r include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F,
                       tidy=T, 
                       tidy.opts=list(width.cutoff=60),
@@ -36,7 +36,7 @@ Framing is a critical strategy for firms to obtain positive evaluations from ext
 \end{abstract}
 
 # Overview
-Evaluation is one of the most basic social processes [@lamont12]. In the business world, garnering positive evaluations from key stakeholders such as government, media, business partners and so on is crucial for organizations to gain legitimacy, obtain resources and establish competitive advantages [@bite11]. Since social evaluation involves an information-processing mechanism that is often subjected to human cogitive and emotional factors, stakeholders' evaluation can heavily be influenced by how firms present themselves. A successful framing strategy, therefore, is essential for firms to project their identities, deliever important information, and guide social evaluation.
+Evaluation is one of the most basic social processes [@lamont12]. In the business world, garnering positive evaluations from key stakeholders such as government, media, business partners and so on is crucial for organizations to gain legitimacy, obtain resources and establish competitive advantages [@bite11]. Since social evaluation involves an information-processing mechanism that is often subjected to human cognitive and emotional factors, stakeholders' evaluation can heavily be influenced by how firms present themselves. A successful framing strategy, therefore, is essential for firms to project their identities, deliver important information, and guide social evaluation.
 
 Organizational scholars define framing as a strategic behavior of creating "a mental bracket that delimits attention to a portion of reality" [@gio15]. Existing research has found that organizations are more likely to win approval when their framing strategies (1) resonate with the needs of stakeholders, (2) are consistent over time, and (3) are moderately novel. Despite these rich findings, one of the understudied topics is the ideal scope of framing. In other words, how focused organizations should be when intentionally projecting themselves to evaluators: should they target at one theme at a time or balance between multiple themes at the same time?
 
@@ -69,11 +69,13 @@ From 1990 to 2011, there were altogether `r n` application reports, which are al
 The major strength of these data is that each application report is a stand-alone, self-presenting file that the award committee heavily relies on to make a judgment, thus providing a suitable context to study the effect of framing. Besides, textual analysis of these application reports can produce more concrete measurements of framing strategies than most of the conventional framing research which often measures framing in a subjective and qualitative approach. Combining textual analysis and framing studies is necessary and even recommended considering that a lot of evaluations are indeed conducted through processing textual information. For example, graduate school committee evaluates applicants through their statements of purpose; investors evaluate projects through business proposals etc.. The major weakness is that these data alone can only provide information in texts. In the future, more external data, such as the revenue of the firms and the yearly government reform goals, will be collected by combining other databases^[For this method paper, this is the best data I can collect for now.].
 
 ##Variables and Measurement
-```{r cleaning2}
+```{r cleaning2,results='asis'}
 # Manually check for overly influential points
 library(xtable)
 tabarea <- t(table(mydata$area1))
-print(xtable(tabarea,label="tab:area",caption="Frequency of Areas. Only four observations in the overseas group is a warning signal for micronumeriosity."),caption.placement = "top")
+print(xtable(tabarea,label="tab:area",
+             caption="Frequency of Areas. Only four observations in the overseas group is a warning signal for micronumeriosity."),
+      caption.placement = "top")
 print(xtable(prop.table(table(mydata$award,mydata$area1),margin=2),
              label="tab:areaaward",
              caption = "Overly Influential Points from the Overseas Area"),
@@ -144,12 +146,14 @@ meany2pct <- sprintf("%.1f%%", meany2 * 100)
 ### Independent variable
 In order to measure framing in textual data, all the application reports have been preliminarily analyzed through a textual analysis technique called topic modeling^[Topic modeling is a machine-learning textual analysis method to read documents, extract common topics, and assign topic coverage probabilities for each document]. As a result, 50 distinct topics are produced, 23 of which describe industries and the other 27 describe innovation areas^[While how the topic modelling process was conducted is beyond the scope of this paper, I would like to emphasize that the interpretation of the topic themes still depends on human rather than machine. I reached the conclusion of whether a topic belongs to the industry category or the innovation category by consulting an experienced panel expert for who worked for CEC for more than a decade.]. Every application report is assigned coverage probabilities of every topic, producing a number of $1633\times50$ topic coverage probability values.
 
-*Framing Focus* is the independent variable in this paper. It measures how balanced an application file is across different innovation topics. I measure this variable by calculating the standard deviation of the coverage probabilities in the three largest innovation topics in an application report. Higher Framing Focus represents that a firm is more focused on one topic instead of spanning multiple topics at the same time. The larger the value of Framing Focus, the narrower the firm frames its innovation accompolishment. For example, if the three largest coverage probabilities for firm A is (0.3, 0.3, 0.3) and for firm B is (0.4, 0.3, 0.2), then the Framing Focus for A and B are 0 and 0.1, meaning that A tries to span across multiple topics while B tries to be more focused on a smaller number of topics.
+*Framing Focus* is the independent variable in this paper. It measures how balanced an application file is across different innovation topics. I measure this variable by calculating the standard deviation of the coverage probabilities in the three largest innovation topics in an application report. Higher Framing Focus represents that a firm is more focused on one topic instead of spanning multiple topics at the same time. The larger the value of Framing Focus, the narrower the firm frames its innovation accomplishment. For example, if the three largest coverage probabilities for firm A is (0.3, 0.3, 0.3) and for firm B is (0.4, 0.3, 0.2), then the Framing Focus for A and B are 0 and 0.1, meaning that A tries to span across multiple topics while B tries to be more focused on a smaller number of topics.
 
-I only choose the three largest innovation topics because three different categories is already an upper limit of information for evaluators to notice and process. If all the 27 innovation topics are used, it only adds more noise because in reality almost no applicant is able to innovate in so many areas, nor would they aim to cover all the innovation topics simultaneously. For a robustness check, I also measured framing focus across four innovation topics and results are similar. In terms of the appropiateness of measurement, according to Figure 1 in @adco11, this measurement could satisfy both a top-down and bottom-up justification on four levels of conceptualization. In this paper, the background concept is firm self-presentation; the systematized concept is framing; the indicator is the focusing/spanning framing strategy of presenting innovation accomplishments in the application reports; scores for cases are standard deviations of the three most salient innovation topics' coverage.
+I only choose the three largest innovation topics because three different categories is already an upper limit of information for evaluators to notice and process. If all the 27 innovation topics are used, it only adds more noise because in reality almost no applicant is able to innovate in so many areas, nor would they aim to cover all the innovation topics simultaneously. For a robustness check, I also measured framing focus across four innovation topics and results are similar. In terms of the appropriateness of measurement, according to Figure 1 in @adco11, this measurement could satisfy both a top-down and bottom-up justification on four levels of conceptualization. In this paper, the background concept is firm self-presentation; the systematized concept is framing; the indicator is the focusing/spanning framing strategy of presenting innovation accomplishments in the application reports; scores for cases are standard deviations of the three most salient innovation topics' coverage.
 
 ### Control Variables
-I added five control variables. *Area*. All the SOEs are divided and into four areas: North, South, East, and West. The regional economic development is very uneven in China. SOEs from different areas often could have different framing strategies to present themselves and the government also evaluate SOEs from differently areas by different criteria. *Scale*. Whether an applicant firm is large- or small-size affects its ability to innovate, to frame its innovation accomplishments and thus affect its winning probability. *Ownership*. Whether an applicant firm is a Central SOE, Ordinary SOE, or other forms directly affects how much resources it can get from the central government. Ownership type is an important marker of SOE differences. *Industry*. Different industries are subjected to different evaluation criteria and tendencies to frame their innovation. I measure the industry variable by referring to the industry topic that has the largest coverage proportion. *Industry Scope*. Industry Scope is actually a second form of framing --- framing the industrial identities. Chinese SOEs are often big bureaucracies that operate across multiple industries. Some of them are so diversfied because of historical reasons of assuming a specifice social responsibility. Government may treat firms differently if they express their multi-industry identities in the application reports, and if a firm has a broader scope of framing in industry, it is more likely to have a broader scope of framing in innovation. I measure this variable by calculating the standard deviation of topic coverage proportions across the three largest covered industry topics.
+I added five control variables. *Area*. All the SOEs are divided and into four areas: North, South, East, and West. The regional economic development is very uneven in China. SOEs from different areas could have different framing strategies to present themselves and the government also evaluate SOEs from differently areas by different criteria. *Scale*. Whether an applicant firm is large- or small-size affects its ability to innovate, to frame its innovation accomplishments and thus affect its winning probability. *Ownership*. Whether an applicant firm is a Central SOE, Ordinary SOE, or other forms directly affects how much resources it can get from the central government. Ownership type is an important marker of SOE differences. *Industry*. Different industries are subjected to different evaluation criteria and tendencies to frame their innovation. I measure the industry variable by referring to the industry topic that has the largest coverage proportion. *Industry Scope*. Industry Scope is actually a second form of framing --- framing the industrial identities. Chinese SOEs are often big bureaucracies that operate across multiple industries. Some of them are so diversified because of historical reasons of assuming a specific social responsibility. Government may treat firms differently if they express their multi-industry identities in the application reports, and if a firm has a broader scope of framing in industry, it is more likely to have a broader scope of framing in innovation. I measure this variable by calculating the standard deviation of topic coverage proportions across the three largest covered industry topics.
+
+From a design-based OLS point of view, control variables are chosen because they are corelated to both the independent variable and the dependent variable. In order to get an unbiased estimate, we need to add such kind of variables into our model. From a model-based view, however, control variables are inherently a part of the model. We include them becasue the random outcome variable is conditional on these variables. OLS can both be design-based and model-based. As will be explained later, I adopted a model-based design. Both OLS and logistic regression are modelled. 
 
 ## Descriptive Statistics
 ```{r description,results='asis'}
@@ -177,7 +181,7 @@ corr <- as.data.frame(cor)
 Table \ref{tab:des} demonstrates descriptive statistics of all the variables. The mean and standard deviation of Framing Focus are `r mean` and `r sd`, so when it comes to interpretation later, I'll use a change of 0.1 of Framing Focus to interpret the change of winning probability.
 
 ## Statistical Inference
-I'm interested in infering the partial relationship between Framing Focus and probability of winning an award. I'm not using an experiment or a quasi-experiment (e.g. using matching to create an "as if" experiment) design, because my major variable of interest is continuous and dichotomizing it would sacrifice valuable information. Instead, I use a model-based design. For a OlS model, the data generating process gives probabilities of winning an award through a normal distribution. For a logit model, the data generating process gives a wining or losing binary outcome which conforms to a Bernoulli distribution. For both models, the probability of having a "success" outcome depends on a set of variables, which are ones that are listed as control variables plus the Framing Focus variable. 
+I'm interested in inferring the partial relationship between Framing Focus and probability of winning an award. I'm not using an experiment or a quasi-experiment (e.g. using matching to create an "as if" experiment) design, because my major variable of interest is continuous and dichotomizing it would sacrifice valuable information. Instead, I use a model-based design. For an OLS model, the data generating process gives probabilities of winning an award through a normal distribution. For a logit model, the data generating process gives a wining or losing binary outcome which conforms to a Bernoulli distribution. For both models, the probability of having a "success" outcome depends on a set of variables, which are ones that are listed as control variables plus the Framing Focus variable. 
 
 What I don't observe that motivates me to do statistical inference is the parameters that maximize the likelihood of observing the data I have given the model is true. In the following sections, I explain how the specific inference is achieved through OLS and logit model respectively. In terms of model assessment, I only presented logit model results. Before I continue, I'd like to state that the repeating process for inference in this paper does not come from permutating, because permutation is more intuitive for an experiment design. It would be harder to interpret the sharp null hypothesis when the "treatment" variable is continuous. 
 
@@ -198,7 +202,7 @@ est.sub <- sprintf("%.1f%%", est * 10) # for interpretation use
 est0 <- summary(ols.model)$coef['innvar',1] # Estimates from the canned OLS model
 car::vif(ols.model)
 ```
-A binary outcome variable is not an adequate reason to exclude using OLS, especially considering that the predicted y range can provide us extra information to evaluate model specification and that we can have multiple techniques to correct for heterogeneity problems. Therefore, I first tried OLS to estimate the relationship between Framing Focus and winning proabilities.
+A binary outcome variable is not an adequate reason to exclude using OLS, especially considering that the predicted y range can provide us extra information to evaluate model specification and that we can have multiple techniques to correct for heterogeneity problems. Therefore, I first tried OLS to estimate the relationship between Framing Focus and winning probabilities.
 
 It turned out that the range of the predicted probabilities is (`r range`). 3.2% of the predicted probabilities are below 0, which is not too serious. Considering the heterogeneity problem, Central Limit Theorem cannot be used for inference. I hereby use bootstrapping to obtain estimates and p-values. I bootstrapped for 1000 times, and the mean estimate for Framing Focus is `r est` (similar to the estimate from the canned OLS model `r est0`), which means that if the deviation from the mean of the three largest innovation topic coverages increase by 0.1, the probability of winning an award will increase by `r est.sub`. The coverage interval is (`r coveint`), which is significant on the 95% level.
 
@@ -210,7 +214,7 @@ log \frac{Pr(award)}{1-Pr(award)}= \beta_{0}+\beta_{1}framing + \beta_{2}area + 
 +\beta_{4}scale +\beta_{5}industry + \beta_{6}industry scope + \epsilon
 \end{split}
 \end{equation}
-Generally, for maximum likelihood method for estimation and inference, the estimates come from first-order derivative of the log likelihood function-- when the first-order derivative equals 0 the likelihood of observing the data is maximized (or minimized depending on the sign of the second derivative at this turning point), and the standard errors come from the second-order derivative. When I use logistic regression, I use maximum likelihood principles to derive estimates and standard errors. The p-values come from comparing against a t-distribution with the estimate being the mean and the stand errors being the standard deviance, what's the chance of observing such an estimate given the model is true. In other words, I'm relying on CLT here to make a reference, which is plausible given the large observation numbers of this study.
+Generally, for maximum likelihood method for estimation and inference, the estimates come from first-order derivative of the log likelihood function-- when the first-order derivative equals 0 the likelihood of observing the data is maximized (or minimized depending on the sign of the second derivative at this turning point), and the standard errors come from the second-order derivative. When I use logistic regression, I use maximum likelihood principles to derive estimates and standard errors. The p-values come from comparing against a t-distribution with the estimate being the mean and the stand errors being the standard deviance, what's the chance of observing such an estimate given the model is true. When sample size is large, the test statistic ($\beta/SE(\beta)$) follows an asymptotic normal distribution.
 
 ```{r ml}
 # Logit model
@@ -222,7 +226,7 @@ pred.logit <- predict(logit.model, type = 'response')
 logit.model1 <- glm(award~ area + ownership + scale + indvar + innvar, data = newdata, family= binomial(link=logit))
 anova(logit.model, logit.model1, test ="Chisq")
 # ...
-# I tried other models with or without a certain variable and with some interactions between variables. By refering to the change of log likelihood and degrees of freedom, it seems that the current model realizes the best fit.
+# I tried other models with or without a certain variable and with some interactions between variables. By refering to the change of log likelihood and degrees of freedom, it seems that the current model realizes the best fit. 
 
 # Other models
 probit.model <- glm(award~ area + ownership + scale + industry + indvar + innvar, data = newdata, family= binomial(link=probit))
@@ -241,6 +245,7 @@ plot(pred.logit,pred.clog)
 dev.off()
 c(logLik(logit.model),logLik(probit.model),logLik(clog.model))
 ```
+
 ```{r presentation, results='asis'}
 est.logit <- logit.model$coefficients["innvar"]
 exp.logit <- exp(0.1*est.logit)
@@ -252,24 +257,42 @@ stargazer(logit.model,omit="industry",omit.labels = "Industry Dummies", header=F
           label="tab:logit" #, type='text'
           )
 ```
-Table \ref{tab:logit} describes the results of the logistic regression. The advantage of a logit model is that predictions of the dependent variable can be strictly bounded between 0 and 1. The disadvantage is that overfitting is a frequent encountered problem, but after dealing with the overly influencial points, there are no apparent evidence of overfitting. 
-\begin{figure}
+Table \ref{tab:logit} describes the results of the logistic regression. The advantage of a logit model is that predictions of the dependent variable can be strictly bounded between 0 and 1. The disadvantage is that overfitting is a frequent encountered problem, but after dealing with the overly influential points, there are no apparent evidence of overfitting. 
+
+Admittedly, logit is not the only link function that can transform $X\beta$, so I also tried probit and cloglog link functions. The log likelihoods across these three link models are very close to each other and the PP-plots (Figure \ref{fig:pplot}) show that the predicted probabilities are around a 45 degree line. Given the relative advantage of interpretation of odds ratio, I only present the results of a logit model here^[I would love to evaluate the link functions using the method of [@roger06], but I have to admit that given my R skills and the limited time, manually comparing these links is the best thing I can do for now].
+
+\begin{figure}[h]
+\centering
 \includegraphics[width=0.6\textwidth]{pplot.pdf}
-\caption{Comparison of the Predicted Probabilities of Logit, Probit and cloglog Links}
+\caption{Comparison of the Predicted Probabilities of Logit, Probit and Cloglog Links: The predicted probablities of probit and cloglog against logit are both around a 45 degree line, indicating that they are rather similar in prediction.}
 \label{fig:pplot}
 \end{figure}
 
-Admittedly, logit is not the only link function that can transform $X\beta$, so I also tried probit and cloglog link functions. The log likelihoods across these three link models are very close to each other and the PP-plots (Figure \ref{fig:pplot}) show that the predicted probablities are around a 45 degree line. Given the relative advantage of interpretation of odds ratio, I only present the results of a logit model here^[I would love to evaluate the link functions using the method of [@roger06], but I have to admit that given my R skills and the limited time, manually comparing these links is the best thing I can do for now].
-
 ```{r evaluation}
+# separability: Given the relatively large estimates of Industry Scope and Framing Focus, is there any possbility of separability?
+# plot(newdata$innvar,newdata$award)
+# plot(newdata$indvar,newdata$award)
+# pass the eyeball test (Fox 2008, p.388)
+
+# multicollearity
+car::vif(logit.model) # the largest one is industry: 2.65
+
 # log likelihood
 ll <- logLik(logit.model)
 
-## the accurate rate of prediction is
-m <- as.data.frame.matrix(table(newdata$award, pred.logit>meany2))
+## the accurate rate of logit prediction is
+ord <- order(pred.logit,decreasing = T)
+m <- as.data.frame.matrix(table(newdata$award, ord < meany2*newn)) # result:0.672
+# ord < meany2*newn. Oftentimes, 0.5 is used as a threhold, @bowen04 recommended using the mean values of the outcome variable as the threshold, but I thought may I keep the award-winning proportions consistent between the actual data and the predicted data
 accrate <- (m[1,1]+m[2,2])/(m[1,1]+m[1,2]+m[2,1]+m[2,2])
+pred.binary <- ifelse(ord < meany2*newn, 1, 0)
+head(pred.binary)
+mean(pred.binary)
+var(pred.binary) > var(newdata$award)
+# overdispersion? According to Fox (2008), the dispersion parameter for binominal GLMs are set to 1. So overdispersion doesn't seem to be a problem for logit models.
+# Do I realy need this way to evalute a logit model? It's more like a prediction evaluation, not an inference evaluation. So, skip this.
 
-## bias
+## bias for y
 mean(pred.logit) - meany2 
 # A very very small number, almost 0. I have a population: meany2 is the mean of winning probabilities of the population.
 
@@ -290,7 +313,8 @@ set.seed(123)
 test <- replicate(n.sim,with(newdata,shuffle(innvar)))
 p1 <- NULL
 for(i in 1:n.sim){
-  p1[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test[,i] , data = newdata, family= binomial(link=logit)))$coefficients[31,4]
+  p1[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test[,i] , 
+                       data = newdata, family= binomial(link=logit)))$coefficients[31,4]
 }
 mean(p1 < .05)
 
@@ -298,7 +322,8 @@ set.seed(456)
 test2 <- replicate(n.sim,with(newdata,shuffle(innvar)))
 p2 <- NULL
 for(i in 1:n.sim){
-  p2[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test2[,i] , data = newdata, family= binomial(link=logit)))$coefficients[31,4]
+  p2[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test2[,i] , 
+                       data = newdata, family= binomial(link=logit)))$coefficients[31,4]
 }
 mean(p2 < .05)
 
@@ -306,7 +331,8 @@ set.seed(789)
 test3 <- replicate(n.sim,with(newdata,shuffle(innvar)))
 p3 <- NULL
 for(i in 1:n.sim){
-  p3[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test3[,i] , data = newdata, family= binomial(link=logit)))$coefficients[31,4]
+  p3[i] <- summary(glm(award~ area + ownership + scale + industry + indvar + test3[,i] , 
+                       data = newdata, family= binomial(link=logit)))$coefficients[31,4]
 }
 mean(p3 < .05)
 fpr <- mean(c(mean(p1< .05),mean(p2<.05 ),mean(p3 < .05)))
@@ -318,15 +344,16 @@ pr2 <- quantile(newdata$innvar,0.75)*logit.model$coefficients["innvar"] + logit.
 diff.pct <- round((exp(pr2) - exp(pr1))*100,2)
 ```
 
-The log likelihood of the logit model is `r ll`. Accurate rate is `r accrate`^[I used the mean values of the outcome variable as the threshold [@bowen04]]. As for Type I error, I conducted three rounds of simulations. Each round repeated for 1000 times. The mean value of these simulations for false positive rate is `r fpr`. The standard deviation for these simulations results are `r fprsd`, which is a small number, showing that the number of simulations is satisfying. It seems that the realized size of Type I error is a little bit larger than the nominal size of Type I error.
+The log likelihood of the logit model is `r ll`. As for Type I error, I conducted three rounds of simulations. Each round repeated for 1000 times. The mean value of these simulations for false positive rate is `r fpr`. The standard deviation for these simulations results are `r fprsd`, which is a small number, showing that the number of simulations is satisfying. It seems that the realized size of Type I error is a little bit larger than the nominal size of Type I error.
 
 The estimate for Framing Focus is `r est.logit`, which means that if the deviation from the mean of the three largest innovation topic coverages increases by 0.1, the odds of winning an award should be multiplied by `r exp.logit` (i.e. exp(0.1*`r est.logit`)). This change is significant at the 0.05 level. This result supported my hypothesis. In a nutshell, an organization should be more focused when it frames itself so it is more likely to be positively evaluated by external stakeholders.
 
-Although this interpretation of logit model looks simple and thus appealing, it avoids talking about the subtantial impact of the independent variable and the awkwardness of the concept "odds ratio". Interpretation is very important for logit models, which is unfortunately often overlooked or glossed over in many published works. However, the probability of winning and Framing Focus is not linearly related in a logit model and the marginal effect depends on the values of other covariates, so I can only interpret the substantial meaning of Framing Focus' impact under some limited conditions: With other covariates held at their mean and dummy variables at zero, moving from 25th to the 75th percentile on Framing Focus is estimated to increase the predicted probability of winning an award by `r diff.pct` percentage points.
+Although this interpretation of logit model looks simple and thus appealing, it avoids talking about the substantial impact of the independent variable and the awkwardness of the concept "odds ratio". Interpretation is very important for logit models, which is unfortunately often overlooked or glossed over in many published works. However, the probability of winning and Framing Focus is not linearly related in a logit model and the marginal effect depends on the values of other covariates, so I can only interpret the substantial meaning of Framing Focus' impact under some limited conditions: With other covariates held at their mean and dummy variables at zero, moving from 25th to the 75th percentile on Framing Focus is estimated to increase the predicted probability of winning an award by `r diff.pct` percentage points.
 
 # Appendix
 As a reproducible research project, all the original data and Rmarkdown file can be accessed through my Github page <https://github.com/yingli0521/award>.
 ```{r appendix, results='verbatim',echo=TRUE,eval=FALSE}
+<<setup>>
 <<cleaning>>
 <<cleaning2>>
 <<variables>>

@@ -1,9 +1,10 @@
 ---
 title: 'Title'
 author: '[Ying Li](https://business.illinois.edu/profile/ying-li/)'
-date: '`r format(Sys.Date())`'
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 fontsize: 12pt
 geometry: margin=1in
+header-includes: \usepackage{setspace}\doublespacing
 output:
   pdf_document:
     latex_engine: xelatex
@@ -15,21 +16,27 @@ output:
 ```{r globalsettings, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(
   tidy=TRUE,
+  tidy.opts=list(width.cutoff=80),
   echo=FALSE,
   message=FALSE,
+  warning=FALSE,
+  error=FALSE,
+  collapse = TRUE,
+  highlight=TRUE, # Increase the readability of source code syntax
   results='asis',
-  strip.white=TRUE,
+  strip.white=TRUE, #To skip white lines
   fig.path='Figures/',
-  cache=FALSE,
-  highlight=TRUE,
+  cache=TRUE,
+  cache.path='cache/',
+  award_time=file.info('award.csv')$mtime, # data will be re-read if award.csv becomes newer
   width.cutoff=80,
-  size='footnotesize',
+  size='footnotesize', # Other options include small, large, Large
   out.width='.9\\textwidth',
   fig.retina=FALSE,
   comment=NA,
   out.extra="")
-
 if(!file.exists('Figures/')) dir.create('Figures/')
+options(scipen = 1, digits = 2)
 ```
 
 
@@ -45,8 +52,12 @@ Figure \ref{fig:bayesplot}
 
 # Appendix 
 ```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
-If you want to remove the first chunk, you can write knitr::all_labels()[-1]
+If you want to remove the first chunk, you can write knitr::all_labels()[-1].
+Of course, this requires you to give a label to each chunk.
 ```
+
+
+# Appendix^[I ]
+```{r appendix, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
 ```
- 
  
